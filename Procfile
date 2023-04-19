@@ -1,1 +1,1 @@
-web: aplusnetworkapi
+web: ./aplusnetworkapi
