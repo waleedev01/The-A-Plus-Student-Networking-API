@@ -3,7 +3,6 @@
 //used for debugging
 error_reporting(-1);
 ini_set('display_errors', 1);
-include '../config.php'; 
 
 //aws database host parameters
 $servername = 'awseb-e-kjywjhzu8p-stack-awsebrdsdatabase-eqsp4bnalizd.chttsa0blrl0.us-east-1.rds.amazonaws.com';
