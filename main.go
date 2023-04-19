@@ -37,12 +37,18 @@ var err error
 
 func main() {
 	// Set up database connection
-	db, err = sql.Open("mysql", "admin:admin123@tcp(awseb-e-kjywjhzu8p-stack-awsebrdsdatabase-eqsp4bnalizd.chttsa0blrl0.us-east-1.rds.amazonaws.com:3306)/edbd")
+	db, err = sql.Open("mysql", "admin:admin123@tcp(awseb-e-kjywjhzu8p-stack-awsebrdsdatabase-eqsp4bnalizd.chttsa0blrl0.us-east-1.rds.amazonaws.com:3306)/ebdb")
 
-	if err != nil {
-		log.Fatal("Cannot connect to database:", err)
-	}
-	defer db.Close()
+if err != nil {
+    log.Fatal("Cannot connect to database:", err)
+}
+
+if err = db.Ping(); err != nil {
+    log.Fatal("Failed to ping database:", err)
+}
+
+defer db.Close()
+
 
 	// Initialize the router
 	initializeRouter()
@@ -71,53 +77,56 @@ func getUserIdByApiKey(apiKey string) (int, error) {
 }
 
 func getEventsAndAttendees(w http.ResponseWriter, r *http.Request) {
-	apiKey := r.Header.Get("API-Key")
-	organizerId, err := getUserIdByApiKey(apiKey)
+    apiKey := r.Header.Get("API-Key")
+    organizerId, err := getUserIdByApiKey(apiKey)
 
-	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, `{"error": "Invalid API key"}`)
-		return
-	}
+    if err != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        fmt.Fprint(w, `{"error": "Insvalid API key"}`)
+        fmt.Print(apiKey)
+        return
+    }
 
-	rows, err := db.Query("SELECT * FROM Event WHERE user_id = ?", organizerId)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, `{"error": "Error fetching events"}`)
-		return
-	}
-	defer rows.Close()
+    rows, err := db.Query("SELECT event_id, name, location, description, start_date, end_date, user_id FROM Event WHERE user_id = ?", organizerId)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        fmt.Fprint(w, `{"error": "Error fetching events"}`)
+        return
+    }
+    defer rows.Close()
 
-	var events []Event
-	for rows.Next() {
-		var event Event
-		err = rows.Scan(&event.EventID, &event.Name, &event.Location, &event.Description, &event.StartDate, &event.EndDate, &event.UserID)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, `{"error": "Error fetching event data"}`)
-			return
-		}
+    var events []Event
+    for rows.Next() {
+        var event Event
+        err = rows.Scan(&event.EventID, &event.Name, &event.Location, &event.Description, &event.StartDate, &event.EndDate, &event.UserID)
+        if err != nil {
+            w.WriteHeader(http.StatusInternalServerError)
+            fmt.Fprint(w, `{"error": "Error fetching event data"}`)
+            log.Printf("Error scanning event data: %v\n", err) // Add this line
+            return
+        }
 
-		event.Attendees, err = getAttendeesForEvent(event.EventID)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, `{"error": "Error fetching attendees"}`)
-			return
-		}
+        event.Attendees, err = getAttendeesForEvent(event.EventID)
+        if err != nil {
+            w.WriteHeader(http.StatusInternalServerError)
+            fmt.Fprint(w, `{"error": "Error fetching attendees"}`)
+            return
+        }
 
-		events = append(events, event)
-	}
+        events = append(events, event)
+    }
 
-	err = rows.Err()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, `{"error": "Error fetching events"}`)
-		return
-	}
+    err = rows.Err()
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        fmt.Fprint(w, `{"error": "Error fetching events"}`)
+        return
+    }
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(events)
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(events)
 }
+
 
 func getAttendeesForEvent(eventId int) ([]Attendee,error) {
 	rows, err := db.Query("SELECT u.user_id, u.name, u.surname, u.email, u.profile_picture, a.school_name, a.bio FROM Event_Members em JOIN User u ON em.user_id = u.user_id JOIN Attendee a ON u.user_id = a.user_id WHERE em.event_id = ?", eventId)
