@@ -1,6 +1,6 @@
 <?php
 
-//used for debugging (it shows errors)
+//used for debugging
 error_reporting(-1);
 ini_set('display_errors', 1);
 include '../config.php'; 
