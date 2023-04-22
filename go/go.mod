@@ -1,4 +1,4 @@
-module example.com/myproject
+module api.com/main
 
 go 1.20
 

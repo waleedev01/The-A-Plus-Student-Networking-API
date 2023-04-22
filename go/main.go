@@ -1,3 +1,5 @@
+//followed this guide for implemen this REST API: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql
+
 package main
 
 import (
@@ -11,15 +13,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
+
+// Define Event and Attendee structs
 type Event struct {
-	EventID     int        `json:"event_id"`
-	Name        string     `json:"name"`
-	Location    string     `json:"location"`
-	Description string     `json:"description"`
+	EventID     int            `json:"event_id"`
+	Name        string         `json:"name"`
+	Location    string         `json:"location"`
+	Description string         `json:"description"`
 	StartDate   mysql.NullTime `json:"start_date"`
 	EndDate     mysql.NullTime `json:"end_date"`
-	UserID      int        `json:"user_id"`
-	Attendees   []Attendee `json:"attendees"`
+	UserID      int            `json:"user_id"`
+	Attendees   []Attendee     `json:"attendees"`
 }
 
 type Attendee struct {
@@ -36,16 +40,7 @@ var db *sql.DB
 var err error
 
 func main() {
-	port := os.Getenv("PORT")
-    if port == "" {
-        port = "8080"
-        log.Printf("Defaulting to port %s", port)
-    }
 
-    // Your router and handler setup code here
-
-    log.Printf("Listening on port %s", port)
-    log.Fatal(http.ListenAndServe(":"+port, router))
 	// Set up database connection
 	db, err = sql.Open("mysql", "admin:admin123@tcp(awseb-e-kjywjhzu8p-stack-awsebrdsdatabase-eqsp4bnalizd.chttsa0blrl0.us-east-1.rds.amazonaws.com:3306)/ebdb")
 
@@ -57,8 +52,7 @@ func main() {
 		log.Fatal("Failed to ping database:", err)
 	}
 
-defer db.Close()
-
+	defer db.Close()
 
 	// Initialize the router
 	initializeRouter()
@@ -67,7 +61,7 @@ defer db.Close()
 func initializeRouter() {
 	r := mux.NewRouter()
 
-	// Add the desired routes
+	// events route
 	r.HandleFunc("/events", getEventsAndAttendees).Methods("GET")
 
 	// Start the server
@@ -75,6 +69,7 @@ func initializeRouter() {
 }
 
 func getUserIdByApiKey(apiKey string) (int, error) {
+	//check if api key is valid and link it to the organizer id
 	var userId int
 	err := db.QueryRow("SELECT user_id FROM Event_Organizer WHERE api_key = ?", apiKey).Scan(&userId)
 
@@ -86,63 +81,69 @@ func getUserIdByApiKey(apiKey string) (int, error) {
 }
 
 func getEventsAndAttendees(w http.ResponseWriter, r *http.Request) {
-    apiKey := r.Header.Get("API-Key")
-    organizerId, err := getUserIdByApiKey(apiKey)
+	// Get API Key and organizer ID
+	apiKey := r.Header.Get("API-Key")
+	organizerId, err := getUserIdByApiKey(apiKey)
 
-    if err != nil {
-        w.WriteHeader(http.StatusUnauthorized)
-        fmt.Fprint(w, `{"error": "Insvalid API key"}`)
-        fmt.Print(apiKey)
-        return
-    }
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprint(w, `{"error": "Insvalid API key"}`)
+		fmt.Print(apiKey)
+		return
+	}
 
-    rows, err := db.Query("SELECT event_id, name, location, description, start_date, end_date, user_id FROM Event WHERE user_id = ?", organizerId)
-    if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
-        fmt.Fprint(w, `{"error": "Error fetching events"}`)
-        return
-    }
-    defer rows.Close()
+	// Fetch events for the organizer
+	rows, err := db.Query("SELECT event_id, name, location, description, start_date, end_date, user_id FROM Event WHERE user_id = ?", organizerId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, `{"error": "Error fetching events"}`)
+		return
+	}
+	defer rows.Close()
 
-    var events []Event
-    for rows.Next() {
-        var event Event
-        err = rows.Scan(&event.EventID, &event.Name, &event.Location, &event.Description, &event.StartDate, &event.EndDate, &event.UserID)
-        if err != nil {
-            w.WriteHeader(http.StatusInternalServerError)
-            fmt.Fprint(w, `{"error": "Error fetching event data"}`)
-            log.Printf("Error scanning event data: %v\n", err) // Add this line
-            return
-        }
+	// Iterate through events and fetch attendees
+	var events []Event
+	for rows.Next() {
+		var event Event
+		err = rows.Scan(&event.EventID, &event.Name, &event.Location, &event.Description, &event.StartDate, &event.EndDate, &event.UserID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, `{"error": "Error fetching event data"}`)
+			log.Printf("Error scanning event data: %v\n", err) // Add this line
+			return
+		}
 
-        event.Attendees, err = getAttendeesForEvent(event.EventID)
-        if err != nil {
-            w.WriteHeader(http.StatusInternalServerError)
-            fmt.Fprint(w, `{"error": "Error fetching attendees"}`)
-            return
-        }
+		event.Attendees, err = getAttendeesForEvent(event.EventID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, `{"error": "Error fetching attendees"}`)
+			return
+		}
 
-        events = append(events, event)
-    }
+		events = append(events, event)
+	}
 
-    err = rows.Err()
-    if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
-        fmt.Fprint(w, `{"error": "Error fetching events"}`)
-        return
-    }
+	err = rows.Err()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, `{"error": "Error fetching events"}`)
+		return
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(events)
+	// Send the response as JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(events)
 }
 
-
-func getAttendeesForEvent(eventId int) ([]Attendee,error) {
+func getAttendeesForEvent(eventId int) ([]Attendee, error) {
+	// Fetch attendees for the given event
 	rows, err := db.Query("SELECT u.user_id, u.name, u.surname, u.email, u.profile_picture, a.school_name, a.bio FROM Event_Members em JOIN User u ON em.user_id = u.user_id JOIN Attendee a ON u.user_id = a.user_id WHERE em.event_id = ?", eventId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
+	// Iterate through attendees and append to the list
 	var attendees []Attendee
 	for rows.Next() {
 		var attendee Attendee
@@ -157,7 +158,8 @@ func getAttendeesForEvent(eventId int) ([]Attendee,error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
+	// Return the list of attendees
 	return attendees, nil
 
 }
