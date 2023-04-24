@@ -10,6 +10,12 @@ $username = 'admin';
 $password = 'admin123';
 $dbname = 'ebdb';
 
+/*local database host parameters
+$servername = 'localhost';
+$username = 'root';
+$password = '';
+$dbname = 'networkingapp';*/
+
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
