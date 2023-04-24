@@ -36,7 +36,7 @@ CREATE TABLE `Attendee` (
   `bio` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   CONSTRAINT `attendee_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `Attendee` (
 
 LOCK TABLES `Attendee` WRITE;
 /*!40000 ALTER TABLE `Attendee` DISABLE KEYS */;
-INSERT INTO `Attendee` VALUES (39,'',''),(40,'City, Uni of London','I love football'),(50,'test','updated test'),(66,'','I love cats');
+INSERT INTO `Attendee` VALUES (39,'',''),(40,'City, Uni of London','I love football and cricket'),(50,'test','updated test'),(66,'','I love cats');
 /*!40000 ALTER TABLE `Attendee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -72,7 +72,7 @@ CREATE TABLE `Attendee_Contact_Event_Organizer` (
   CONSTRAINT `Attendee_Contact_Event_Organizer_ibfk_1` FOREIGN KEY (`attendee_id`) REFERENCES `Attendee` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Attendee_Contact_Event_Organizer_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `Attendee_Contact_Event_Organizer_ibfk_3` FOREIGN KEY (`organizer_id`) REFERENCES `Event_Organizer` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -129,7 +129,7 @@ CREATE TABLE `Contact_Form` (
   PRIMARY KEY (`contact_form_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `contact_form_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,7 +175,7 @@ CREATE TABLE `Event` (
 
 LOCK TABLES `Event` WRITE;
 /*!40000 ALTER TABLE `Event` DISABLE KEYS */;
-INSERT INTO `Event` VALUES (51,'Amazon Cloud Computing','4be94849','2023-04-19','Learn about cloud computing with Patrik','2023-04-27','2023-05-04','14:00','','progress','San Francisco, CA',39,'Cloud Computing'),(52,'Theory of Computation','59f52f14','2023-04-19','Lecture about Turing machine','2023-04-26','2023-05-03','20:41','','created','Oakden',1,'Bring your laptop.');
+INSERT INTO `Event` VALUES (51,'Amazon Cloud Computing','4be94849','2023-04-19','Learn about cloud computing with Patrik','2023-04-27','2023-08-04','14:00','','progress','San Francisco, CA',39,'Cloud Computing'),(52,'Theory of Computation','59f52f14','2023-04-19','Lecture about Turing machine','2023-04-26','2023-08-03','20:41','','created','Oakden',1,'Bring your laptop.');
 /*!40000 ALTER TABLE `Event` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -258,7 +258,7 @@ CREATE TABLE `Message` (
   CONSTRAINT `message_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `message_ibfk_2` FOREIGN KEY (`subgroup_id`) REFERENCES `Subgroup` (`subgroup_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `message_ibfk_3` FOREIGN KEY (`event_id`) REFERENCES `Event` (`event_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=376 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=397 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -286,7 +286,7 @@ CREATE TABLE `Private_Message` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `private_message_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `private_message_ibfk_2` FOREIGN KEY (`message_id`) REFERENCES `Message` (`message_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=375 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=396 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -322,7 +322,7 @@ CREATE TABLE `Subgroup` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `subgroup_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `subgroup_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -331,7 +331,7 @@ CREATE TABLE `Subgroup` (
 
 LOCK TABLES `Subgroup` WRITE;
 /*!40000 ALTER TABLE `Subgroup` DISABLE KEYS */;
-INSERT INTO `Subgroup` VALUES (23,'exercise 1','help with ex1','2023-04-28','12:44','',12,'a301',52,50);
+INSERT INTO `Subgroup` VALUES (23,'exercise 1','help with ex1','2023-04-28','12:44','',10,'a301',52,50);
 /*!40000 ALTER TABLE `Subgroup` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -433,7 +433,7 @@ CREATE TABLE `User` (
   `profile_picture` varchar(255) DEFAULT NULL,
   `role` enum('attendee','supervisor','organizer','admin') NOT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -442,7 +442,7 @@ CREATE TABLE `User` (
 
 LOCK TABLES `User` WRITE;
 /*!40000 ALTER TABLE `User` DISABLE KEYS */;
-INSERT INTO `User` VALUES (1,'waleed','hassan','hassanwaleedev@gmail.com','833f3cdbcdd7ce4dc4cd7481fcec9df5',NULL,'admin'),(39,'Amazon','Uk','amazon@organizer.com','f5f8f6d587f2ca16648e4c22a095986b',NULL,'organizer'),(40,'waleed','hassan','waleed.hassan0120@gmail.com','b7ce8294183a0f2a6092b6cb2f17b9b5','https://aplus-network-app.s3.amazonaws.com/profile_pictures/644014ef4d2c1.jpeg','attendee'),(50,'php','unit','test@test.test','098f6bcd4621d373cade4e832627b4f6',NULL,'attendee'),(66,'Andrea','Giapponesi','andrea@cremo.com','8d28898f353eda472701f2b68d2a8cdb','https://aplus-network-app.s3.amazonaws.com/profile_pictures/6445a77c48086.jpeg','supervisor');
+INSERT INTO `User` VALUES (1,'waleed','hassan','hassanwaleedev@gmail.com','833f3cdbcdd7ce4dc4cd7481fcec9df5',NULL,'admin'),(39,'Amazon','Uk','amazon@organizer.com','f5f8f6d587f2ca16648e4c22a095986b',NULL,'organizer'),(40,'waleed','hassan','waleed.hassan0120@gmail.com','b7ce8294183a0f2a6092b6cb2f17b9b5','https://aplus-network-app.s3.amazonaws.com/profile_pictures/644014ef4d2c1.jpeg','attendee'),(50,'php','new unit','test@test.test','098f6bcd4621d373cade4e832627b4f6',NULL,'attendee'),(66,'Andrea','Giapponesi','andrea@cremo.com','8d28898f353eda472701f2b68d2a8cdb','https://aplus-network-app.s3.amazonaws.com/profile_pictures/6445a77c48086.jpeg','supervisor');
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 UNLOCK TABLES;
 SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
@@ -456,4 +456,4 @@ SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-24 16:22:26
+-- Dump completed on 2023-04-24 17:23:55
