@@ -9,12 +9,12 @@ include '../database_connection/database_connection.php';
 // Function to get user ID by using the API key
 function getUserIdByApiKey($api_key, $conn) {
     // Check if there is an organizer with the same API key
-    $query = "SELECT user_id FROM Event_Organizer WHERE api_key = '$api_key'";
-    $result = mysqli_query($conn, $query);
+    $queryUsers = "SELECT user_id FROM Event_Organizer WHERE api_key = '$api_key'";
+    $resultUsers = mysqli_query($conn, $queryUsers);
 
     // Return user_id if found
-    if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
+    if (mysqli_num_rows($resultUsers) > 0) {
+        $row = mysqli_fetch_assoc($resultUsers);
         return $row['user_id'];
     } else {
         return null;
@@ -24,8 +24,8 @@ function getUserIdByApiKey($api_key, $conn) {
 // Function to get organizer events and attendees
 function getEventsAndAttendees($organizer_id, $conn) {
     //get all events for the specified organizer
-    $query_events = "SELECT * FROM Event WHERE user_id = '$organizer_id'";
-    $resultEvents = mysqli_query($conn, $query_events);
+    $queryEvents = "SELECT * FROM Event WHERE user_id = '$organizer_id'";
+    $resultEvents = mysqli_query($conn, $queryEvents);
 
     // Fetch event data and store it in an array
     $events = [];

@@ -1,4 +1,7 @@
-//followed this guide for implemen this REST API: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql
+//followed this guide for implementing this REST API: https://semaphoreci.com/community/tutorials/building-and-testing-a-rest-api-in-go-with-gorilla-mux-and-postgresql
+
+//This go app retrieves and returns event and attendee data for organizers using their API key. 
+
 
 package main
 
